@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한끼 밥상 탄소 계산기 🌿</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <div class="header-full">
+            <div class="header-top-bar">
+                <div id="auth-status-area">
+                    <button id="btn-open-auth" class="btn-sub" onclick="openModal('auth-modal')">👤 로그인 / 회원가입</button>
+                    <span id="user-info" class="hidden">
+                        <span id="user-email" class="user-email-text"></span>님 🌱
+                        <button id="btn-open-pw-change" class="btn-sub-action"
+                            onclick="openModal('pw-change-modal')">비밀번호 변경</button>
+                        <button onclick="handleDeleteAccount()" class="btn-sub-action text-red">회원탈퇴</button>
+                        <button onclick="handleSignOut()" class="btn-sub-action font-bold">로그아웃</button>
+                    </span>
+                </div>
+            </div>
+            <h1>한끼 밥상 탄소 계산기</h1>
+            <p>내가 고른 음식들의 탄소 발자국은 어느 정도일까요?</p>
+        </div>
+
+        <section class="menu-section">
+            <div class="tabs" id="category-tabs">
+                <button class="tab-btn active" data-category="all">모든 음식</button>
+                <button class="tab-btn" data-category="rice">밥·죽·면</button>
+                <button class="tab-btn" data-category="soup">국·탕·찌개</button>
+                <button class="tab-btn" data-category="side">반찬·고기</button>
+                <button class="tab-btn" data-category="etc">기타·분식</button>
+            </div>
+
+            <div class="food-grid" id="food-grid">
+            </div>
+        </section>
+
+        <section class="result-section">
+            <div class="dining-table" id="dining-table">
+                <div id="table-placeholder" class="table-placeholder">음식을 클릭해 식탁에 올려주세요</div>
+            </div>
+
+            <div class="result-panel">
+                <div class="result-title">오늘 한끼 식사로 배출한 온실가스</div>
+                <div class="total-co2"><span id="co2-value">0.0</span> kgCO₂e</div>
+
+                <p>이는 승용차가 <span class="co2-highlight"><span id="km-value">0</span>km</span> 이동 시 배출하는 온실가스량이며,<br>
+                    이를 흡수하려면 소나무 <span class="tree-highlight"><span id="tree-value">0</span>그루</span>가 필요합니다.</p>
+
+                <div class="visual-track">
+                    <div class="car" id="car-icon">🚗</div>
+                </div>
+                <div class="trees" id="tree-icons"></div>
+
+                <div class="period-selector">
+                    이 식단으로 1명이
+                    <select id="period-select">
+                        <option value="1">1일</option>
+                        <option value="7" selected>1주일</option>
+                        <option value="30">1개월</option>
+                        <option value="365">1년</option>
+                    </select>
+                    식사할 경우: <br>
+                    <strong class="co2-highlight" id="multi-km">0</strong>km 주행 및 소나무 <strong class="tree-highlight"
+                        id="multi-tree">0</strong>그루 분량
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-reset" id="btn-reset">↺ 밥상 다시 차리기</button>
+                    <button class="btn-save" id="btn-save-cloud" disabled>☁️ Supabase에 밥상 저장</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <!-- 인증 모달 (로그인/회원가입) -->
+    <div id="auth-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="welcome-header">
+                <h2>Welcome to 한끼 밥상 🌿</h2>
+                <p>음식을 식탁에 올리고 탄소 발자국을 추적해 보세요!</p>
+            </div>
+            <div class="modal-header">
+                <div class="modal-tabs">
+                    <button id="modal-tab-login" class="modal-tab active" onclick="switchModalTab('login')">로그인</button>
+                    <button id="modal-tab-register" class="modal-tab" onclick="switchModalTab('register')">회원가입</button>
+                </div>
+                <button id="btn-close-auth" class="modal-close" onclick="closeModal('auth-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- 로그인 폼 -->
+                <div id="modal-login-form" class="auth-form">
+                    <div class="form-group">
+                        <label>이메일 주소</label>
+                        <input type="email" id="loginEmail" placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>비밀번호</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••">
+                    </div>
+                    <div class="form-options">
+                        <label class="remember-me-label">
+                            <input type="checkbox" id="rememberMe"> Remember me
+                        </label>
+                        <button class="link-btn" onclick="handleForgotPassword()">비밀번호 찾기</button>
+                    </div>
+                    <p id="login-error-msg" class="error-msg hidden"></p>
+                    <button class="btn-primary" onclick="handleSignIn()">로그인</button>
+                </div>
+
+                <!-- 회원가입 폼 -->
+                <div id="modal-register-form" class="auth-form hidden">
+                    <div class="form-group">
+                        <label>이메일 주소</label>
+                        <input type="email" id="registerEmail" placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>비밀번호 (8자 이상, 영문/숫자 조합)</label>
+                        <input type="password" id="registerPassword" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>비밀번호 확인</label>
+                        <input type="password" id="registerPasswordConfirm" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>비밀번호 분실 시 힌트 질문</label>
+                        <select id="registerHintQuestion"
+                            style="width: 100%; padding: 12px; border: 1.5px solid #e0e0e0; border-radius: 12px; outline: none; font-size: 0.95rem; font-family: inherit;">
+                            <option value="가장 기억에 남는 장소는 어디인가요?">가장 기억에 남는 장소는 어디인가요?</option>
+                            <option value="졸업한 초등학교의 이름은 무엇인가요?">졸업한 초등학교의 이름은 무엇인가요?</option>
+                            <option value="첫 번째 반려동물의 이름은 무엇인가요?">첫 번째 반려동물의 이름은 무엇인가요?</option>
+                            <option value="가장 좋아하는 음식은 무엇인가요?">가장 좋아하는 음식은 무엇인가요?</option>
+                            <option value="본인의 보물 1호는 무엇인가요?">본인의 보물 1호는 무엇인가요?</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>힌트 답변</label>
+                        <input type="text" id="registerHintAnswer" placeholder="힌트 답변을 입력해주세요.">
+                    </div>
+                    <p id="register-error-msg" class="error-msg hidden"></p>
+                    <button class="btn-primary" onclick="handleSignUp()">회원가입</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 비밀번호 변경 모달 -->
+    <div id="pw-change-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>비밀번호 변경</h2>
+                <button class="modal-close" onclick="closeModal('pw-change-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>새 비밀번호 (8자 이상, 영문/숫자 조합)</label>
+                    <input type="password" id="newPassword" placeholder="••••••••">
+                </div>
+                <button class="btn-primary" onclick="handleChangePassword()">비밀번호 변경 적용</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 회원탈퇴 확인 모달 -->
+    <div id="delete-account-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: #d32f2f;">정말 회원 탈퇴하시겠습니까?</h2>
+                <button class="modal-close" onclick="closeModal('delete-account-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; font-size: 0.95rem; color: #555; text-align: left;">
+                    회원 탈퇴 시 작성하셨던 모든 식단 탄소 발자국 기록과 계정 정보가 <strong style="color: #d32f2f;">영구히 삭제</strong>되며, 절대 복구할 수
+                    없습니다.
+                </p>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-sub" style="flex: 1; padding: 12px; border-radius: 8px;"
+                        onclick="closeModal('delete-account-modal')">취소</button>
+                    <button class="btn-primary" style="flex: 1; padding: 12px; border-radius: 8px; background: #d32f2f;"
+                        onclick="confirmDeleteAccount()">회원탈퇴 완료</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 비밀번호 찾기 모달 (힌트 답변형) -->
+    <div id="pw-find-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>비밀번호 찾기 (힌트 복구)</h2>
+                <button class="modal-close" onclick="closeModal('pw-find-modal')">×</button>
+            </div>
+            <div class="modal-body" id="pw-find-step1">
+                <div class="form-group">
+                    <label>가입된 이메일 주소</label>
+                    <input type="email" id="findEmail" placeholder="example@email.com">
+                </div>
+                <p id="find-error-msg-step1" class="error-msg hidden"></p>
+                <button class="btn-primary" onclick="checkUserHint()">힌트 질문 확인</button>
+            </div>
+            <div class="modal-body hidden" id="pw-find-step2">
+                <div class="form-group"
+                    style="background: #f1f3f5; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                    <label style="color: #2E7D32; font-weight: bold; margin-bottom: 4px;">분실 시 힌트 질문</label>
+                    <p id="hint-question-display" style="font-weight: 500; font-size: 0.95rem; color: #333;"></p>
+                </div>
+                <div class="form-group">
+                    <label>힌트 답변 입력</label>
+                    <input type="text" id="findAnswer" placeholder="설정하신 답변을 입력해주세요.">
+                </div>
+                <div class="form-group">
+                    <label>변경할 새 비밀번호 (8자 이상, 영문/숫자 조합)</label>
+                    <input type="password" id="findNewPassword" placeholder="••••••••">
+                </div>
+                <p id="find-error-msg-step2" class="error-msg hidden"></p>
+                <button class="btn-primary" onclick="resetPasswordByHint()">비밀번호 재설정 완료</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
