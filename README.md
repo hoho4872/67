@@ -83,7 +83,7 @@ npx http-server -p 8080
 python -m http.server 8080
 
 # 3. 브라우저에서 접속
-# http://localhost:8080
+# https://hoho4872.github.io/67/
 ```
 
 > ⚠️ Supabase 연동 기능(회원가입/로그인/저장)을 사용하려면  
