@@ -148,6 +148,167 @@ select { padding: 5px 10px; border-radius: 5px; border: 1px solid #ccc; font-fam
     .menu-section, .result-section { width: 100%; }
 }
 
+@media (max-width: 480px) {
+    body {
+        padding: 20px 10px;
+    }
+
+    .app-container {
+        gap: 15px;
+    }
+
+    /* 모바일 화면에서 최소 너비 제한 해제하여 가로 오버플로우 방지 */
+    .menu-section, .result-section {
+        min-width: unset !important;
+        width: 100%;
+    }
+
+    .header-full h1 {
+        font-size: 1.8rem;
+    }
+
+    .header-full p {
+        font-size: 0.95rem;
+    }
+
+    /* 상단 유저정보 영역 반응형 조정 */
+    .header-top-bar {
+        padding: 10px;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+        text-align: center;
+    }
+
+    #auth-status-area {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    #user-info {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-sub-action {
+        margin-left: 5px;
+        margin-right: 5px;
+        font-size: 0.75rem;
+    }
+
+    /* 탭 가로 스크롤 처리 */
+    .tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+        gap: 8px;
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .tabs::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+
+    .tab-btn {
+        flex: 0 0 auto;
+        padding: 6px 14px;
+        font-size: 0.85rem;
+    }
+
+    /* 식탁 높이 및 요소 크기 축소 */
+    .dining-table {
+        height: 180px;
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .table-item {
+        font-size: 2.5rem;
+    }
+
+    /* 결과 패널 반응형 조정 */
+    .result-panel {
+        padding: 15px;
+    }
+
+    .total-co2 {
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+    }
+
+    .period-selector {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    /* 액션 버튼 세로 정렬 */
+    .action-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-reset, .btn-save {
+        width: 100%;
+        margin-top: 0;
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+
+    /* 모달 모바일 최적화 */
+    .modal-content {
+        padding: 25px 15px !important;
+        width: 95%;
+    }
+
+    .modal-tabs .modal-tab {
+        font-size: 1.05rem;
+    }
+
+    .form-group input {
+        padding: 10px 12px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .btn-primary {
+        padding: 11px !important;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 375px) {
+    /* 375px 이하 초소형 모바일 기기를 위한 세부 튜닝 */
+    .food-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+    }
+
+    .food-card {
+        padding: 10px 5px;
+    }
+
+    .food-icon {
+        font-size: 2.2rem;
+        margin-bottom: 4px;
+    }
+
+    .food-name {
+        font-size: 0.8rem;
+    }
+
+    .dining-table {
+        height: 160px;
+    }
+
+    .table-item {
+        font-size: 2.2rem;
+    }
+}
+
 /* --- Supabase 설정 및 인증 기능 추가 스타일 --- */
 
 /* 상단 서브 헤더 바 */
